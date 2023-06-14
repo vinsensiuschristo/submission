@@ -67,26 +67,24 @@ class SongsHandler {
 
   async getSongsHandler(request) {
     // bagian query param
-    if (request.query.title) {
-      console.log('title');
-    } else if (request.query.performer) {
-      console.log('performer');
-    } if (request.query.title && request.query.performer) {
-      console.log('title & performer');
+    try {
+      const { title, performer } = request.query;
+      const songs = await this._service.getSongs({ title, performer });
+
+      return {
+        status: 'success',
+        data: {
+          songs: songs.map((song) => ({
+            id: song.id,
+            title: song.title,
+            performer: song.performer,
+          })),
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return console.log(error);
     }
-
-    const songs = await this._service.getSongs();
-
-    return {
-      status: 'success',
-      data: {
-        songs: songs.map((song) => ({
-          id: song.id,
-          title: song.title,
-          performer: song.performer,
-        })),
-      },
-    };
   }
 
   async getSongByIdHandler(request, h) {
