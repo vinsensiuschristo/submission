@@ -44,7 +44,7 @@ class SongsService {
   async getSongs({ title, performer }) {
     if (title && performer) {
       const query = {
-        text: 'SELECT * FROM songs WHERE title LIKE $1 AND performer LIKE $2',
+        text: 'SELECT * FROM songs WHERE title ILIKE $1 AND performer ILIKE $2',
         values: [`%${title}%`, `%${performer}%`],
       };
       const result = await this._pool.query(query);
@@ -53,7 +53,7 @@ class SongsService {
 
     if (title || performer) {
       const query = {
-        text: 'SELECT * FROM songs WHERE title LIKE $1 OR performer LIKE $2',
+        text: 'SELECT * FROM songs WHERE title ILIKE $1 OR performer ILIKE $2',
         values: [`%${title}%`, `%${performer}%`],
       };
       const result = await this._pool.query(query);
