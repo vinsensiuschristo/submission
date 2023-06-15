@@ -50,12 +50,12 @@ class AlbumsHandler {
     }
   }
 
-  // ini biar bisa dapet detail lagu lagu
   async getAlbumByIdHandler(request, h) {
     try {
       const { id } = request.params;
 
       const album = await this._service.getAlbumById(id);
+      const songs = await this._service.getAlbumSongsById(id);
 
       return {
         status: 'success',
@@ -64,6 +64,7 @@ class AlbumsHandler {
             id: album.id,
             name: album.name,
             year: album.year,
+            songs,
           },
         },
       };
