@@ -9,9 +9,10 @@ class PlaylistsService {
     this._pool = new Pool();
   }
 
+  // Service For Playlist
   async addPlaylist({ name }) {
     const id = `playlist-${nanoid(16)}`;
-    const owner = 'test';
+    const owner = 'user-VQSgF9GJKJzBM8rk';
 
     const query = {
       text: 'INSERT INTO playlists VALUES($1, $2, $3) RETURNING id',
@@ -37,9 +38,31 @@ class PlaylistsService {
     return result.rows;
   }
 
-  async getPlaylistById(id) {
+  async deletePlaylistById(id) {
+    const query = {
+      text: 'DELETE FROM playlists WHERE id = $1 RETURNING id',
+      values: [id],
+    };
 
+    const result = await this._pool.query(query);
+
+    if (!result.rows.length) {
+      throw new NotFoundError('Playlist gagal dihapus. Id tidak ditemukan');
+    }
   }
+
+  // Service For PlaylistSong
+  // async addPlaylistSong() {
+
+  // }
+
+  // async getPlaylistSong() {
+
+  // }
+
+  // async deletePlaylistSongById(id) {
+
+  // }
 }
 
 module.exports = PlaylistsService;
