@@ -6,8 +6,9 @@ const NotFoundError = require('../../exceptions/NotFoundError');
 const AuthorizationError = require('../../exceptions/AuthorizationError');
 
 class PlaylistsService {
-  constructor() {
+  constructor(playlistSongsService) {
     this._pool = new Pool();
+    this._playlistSongsService = playlistSongsService;
   }
 
   async verifyPlaylistOwner(id, owner) {
@@ -26,6 +27,23 @@ class PlaylistsService {
 
     if (playlist.owner !== owner) {
       throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
+    }
+  }
+
+  // tambahan
+  async verifyPlaylistAccess(playlistId, songId) {
+    try {
+      await this.verifyPlaylistOwner(playlistId, songId);
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw error;
+      }
+
+      try {
+        await this.verifyPlaylistSongOwner(playlistId, songId);
+      } catch {
+        throw error;
+      }
     }
   }
 
@@ -72,17 +90,21 @@ class PlaylistsService {
     }
   }
 
-  // Service For PlaylistSong
-  // async addPlaylistSong() {
+  // // tambahan
+  // async verifyPlaylistSongsAccess(playlistId, songId) {
+  //   try {
+  //     await this.verifyPlaylistOwner(playlistId, songId);
+  //   } catch (error) {
+  //     if (error instanceof NotFoundError) {
+  //       throw error;
+  //     }
 
-  // }
-
-  // async getPlaylistSong() {
-
-  // }
-
-  // async deletePlaylistSongById(id) {
-
+  //     try {
+  //       await this._playlistSongsService.verifyPlaylistSongOwner(playlistId, songId);
+  //     } catch {
+  //       throw error;
+  //     }
+  //   }
   // }
 }
 
