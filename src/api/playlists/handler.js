@@ -15,10 +15,13 @@ class PlaylistsHandler {
     try {
       this._validator.validatePlaylistPayload(request.payload);
 
-      const { name, owner = 'user-VQSgF9GJKJzBM8rk' } = request.payload;
+      const { name } = request.payload;
+
+      // tambahan dari authorziation
+      const { id: credentialId } = request.auth.credentials;
 
       const playlistId = await this._service.addPlaylist({
-        name, owner,
+        name, owner: credentialId,
       });
 
       const response = h.response({
@@ -51,9 +54,12 @@ class PlaylistsHandler {
     }
   }
 
-  async getPlaylistsHandler() {
+  async getPlaylistsHandler(request) {
     try {
-      const playlists = await this._service.getPlaylists();
+      // tambahan
+      const { id: credentialId } = request.auth.credentials;
+
+      const playlists = await this._service.getPlaylists(credentialId);
 
       return {
         status: 'success',

@@ -3,16 +3,35 @@ const { Pool } = require('pg');
 const { nanoid } = require('nanoid');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
+const AuthorizationError = require('../../exceptions/AuthorizationError');
 
 class PlaylistsService {
   constructor() {
     this._pool = new Pool();
   }
 
+  async verifyPlaylistOwner(id, owner) {
+    const query = {
+      text: 'SELECT * FROM playlists WHERE id = $1',
+      values: [id],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rows.length) {
+      throw new NotFoundError('Playlist tidak ditemukan');
+    }
+
+    const playlist = result.rows[0];
+
+    if (playlist.owner !== owner) {
+      throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
+    }
+  }
+
   // Service For Playlist
-  async addPlaylist({ name }) {
+  async addPlaylist({ name, owner }) {
     const id = `playlist-${nanoid(16)}`;
-    const owner = 'user-VQSgF9GJKJzBM8rk';
 
     const query = {
       text: 'INSERT INTO playlists VALUES($1, $2, $3) RETURNING id',
@@ -28,9 +47,11 @@ class PlaylistsService {
     return result.rows[0].id;
   }
 
-  async getPlaylists() {
+  // mungkin response nya belum sama
+  async getPlaylists(owner) {
     const query = {
-      text: 'SELECT * FROM playlists',
+      text: 'SELECT * FROM playlists WHERE owner = $1',
+      values: [owner],
     };
 
     const result = await this._pool.query(query);
