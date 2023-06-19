@@ -28,15 +28,35 @@ class PlaylistSongsService {
 
   // Playlist songs
   // try
-  async getPlaylistSong(playlistId) {
+  async getPlaylistSong(playlistId, credentialId) {
     const query = {
-      text: 'SELECT * FROM playlist_songs WHERE playlist_id = $1',
-      values: [playlistId],
+      text: `SELECT playlists.id, playlists.name, users.username
+      FROM playlists
+      INNER JOIN users
+      ON users.id = playlists.owner
+      WHERE playlists.id = $1 AND playlists.owner = $2`,
+      values: [playlistId, credentialId],
     };
 
     const result = await this._pool.query(query);
 
-    return result.rows;
+    return result.rows[0];
+  }
+
+  // inner join playlist_songs sama song
+
+  async getSongs(id) {
+    const queryGetSongs = {
+      text: `SELECT songs.id, songs.title, songs.performer
+      FROM songs
+      INNER JOIN playlist_songs 
+      ON playlist_songs.song_id = songs.id
+      WHERE playlist_songs.playlist_id = $1`,
+      values: [id],
+    };
+    const songsResult = await this._pool.query(queryGetSongs);
+
+    return songsResult.rows;
   }
 
   async deletePlaylistSongById(playlistId, songId) {

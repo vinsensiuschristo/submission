@@ -56,19 +56,20 @@ class PlaylistSongsHandler {
     try {
       // tambahan
       const { id: credentialId } = request.auth.credentials;
+      const playlistId = request.params.id;
 
-      const playlists = await this._playlistsService.getPlaylistSong(credentialId);
-
-      console.log(credentialId);
+      const playlists = await this._playlistSongsService.getPlaylistSong(playlistId, credentialId);
+      const songs = await this._playlistSongsService.getSongs(playlistId);
 
       return {
         status: 'success',
         data: {
-          playlists: playlists.map((playlist) => ({
-            id: playlist.id,
-            name: playlist.name,
-            username: playlist.owner,
-          })),
+          playlist: {
+            id: playlists.id,
+            name: playlists.name,
+            username: playlists.username,
+            songs,
+          },
         },
       };
     } catch (error) {
@@ -82,14 +83,14 @@ class PlaylistSongsHandler {
       this._validator.validatePlaylistSongPayload(request.payload);
       const { id: credentialId } = request.auth.credentials;
       const { songId } = request.payload;
-      const { playlistId } = request.params;
+      const playlistId = request.params.id;
 
       await this._playlistsService.verifyPlaylistOwner(playlistId, credentialId);
-      await this._playlistSongsService.deletePlaylistSongHandler(playlistId, songId);
+      await this._playlistSongsService.deletePlaylistSongById(playlistId, songId);
 
       return {
         status: 'success',
-        message: 'Kolaborasi berhasil dihapus',
+        message: 'Playlist Song berhasil dihapus',
       };
     } catch (error) {
       if (error instanceof ClientError) {
