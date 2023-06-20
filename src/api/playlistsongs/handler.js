@@ -145,7 +145,6 @@ class PlaylistSongsHandler {
     }
   }
 
-  // get activitiesSongHandler
   async getPlaylistActivitiesSongHandler(request, h) {
     try {
       const { id: credentialId } = request.auth.credentials;
