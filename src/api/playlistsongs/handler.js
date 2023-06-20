@@ -11,7 +11,6 @@ class PlaylistSongsHandler {
     autoBind(this);
   }
 
-  // PlaylistSongs Handler
   async postPlaylistSongHandler(request, h) {
     try {
       this._validator.validatePlaylistSongPayload(request.payload);
@@ -25,7 +24,7 @@ class PlaylistSongsHandler {
 
       const response = h.response({
         status: 'success',
-        message: 'Kolaborasi berhasil ditambahkan',
+        message: 'Playlist Song berhasil ditambahkan',
         data: {
           playlistSongId,
         },
@@ -52,11 +51,13 @@ class PlaylistSongsHandler {
     }
   }
 
-  async getPlaylistSongsHandler(request) {
+  async getPlaylistSongsHandler(request, h) {
     try {
       // tambahan
       const { id: credentialId } = request.auth.credentials;
       const playlistId = request.params.id;
+
+      await this._playlistsService.verifyPlaylistOwner(playlistId, credentialId);
 
       const playlists = await this._playlistSongsService.getPlaylistSong(playlistId, credentialId);
       const songs = await this._playlistSongsService.getSongs(playlistId);
@@ -73,8 +74,23 @@ class PlaylistSongsHandler {
         },
       };
     } catch (error) {
-      console.log(error);
-      return console.log(error);
+      if (error instanceof ClientError) {
+        const response = h.response({
+          status: 'fail',
+          message: error.message,
+        });
+        response.code(error.statusCode);
+        return response;
+      }
+
+      // Server ERROR!
+      const response = h.response({
+        status: 'error',
+        message: 'Maaf, terjadi kegagalan pada server kami.',
+      });
+      response.code(500);
+      console.error(error);
+      return response;
     }
   }
 

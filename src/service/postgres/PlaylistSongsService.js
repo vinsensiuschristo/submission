@@ -3,15 +3,27 @@
 const { Pool } = require('pg');
 const { nanoid } = require('nanoid');
 const InvariantError = require('../../exceptions/InvariantError');
+const NotFoundError = require('../../exceptions/NotFoundError');
 
 class PlaylistSongsService {
   constructor() {
     this._pool = new Pool();
   }
 
-  // Service For PlaylistSong
   async addPlaylistSong(playlistId, songId) {
     const id = `playlist-songs-${nanoid(16)}`;
+
+    // check song table, ada idSong yang di input ga
+    const checkSongQuery = {
+      text: 'SELECT id from songs WHERE id = $1',
+      values: [songId],
+    };
+
+    const resultSongQuery = await this._pool.query(checkSongQuery);
+
+    if (!resultSongQuery.rows.length) {
+      throw new NotFoundError('Playlist Song gagal ditambahkan, Song tidak ditemukan');
+    }
 
     const query = {
       text: 'INSERT INTO playlist_songs  VALUES($1, $2, $3) RETURNING id',
@@ -26,15 +38,13 @@ class PlaylistSongsService {
     return result.rows[0].id;
   }
 
-  // Playlist songs
-  // try
   async getPlaylistSong(playlistId, credentialId) {
     const query = {
       text: `SELECT playlists.id, playlists.name, users.username
-      FROM playlists
-      INNER JOIN users
-      ON users.id = playlists.owner
-      WHERE playlists.id = $1 AND playlists.owner = $2`,
+    FROM playlists
+    INNER JOIN users
+    ON users.id = playlists.owner
+    WHERE playlists.id = $1 AND playlists.owner = $2`,
       values: [playlistId, credentialId],
     };
 
@@ -42,8 +52,6 @@ class PlaylistSongsService {
 
     return result.rows[0];
   }
-
-  // inner join playlist_songs sama song
 
   async getSongs(id) {
     const queryGetSongs = {
@@ -72,7 +80,6 @@ class PlaylistSongsService {
     }
   }
 
-  // fungsi ini sama denga verifyCollaborator
   async verifyPlaylistSongOwner(playlistId, songId) {
     const query = {
       text: 'SELECT * FROM playlist_songs WHERE playlist_id = $1 AND song_id = $2',

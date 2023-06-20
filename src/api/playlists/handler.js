@@ -81,6 +81,11 @@ class PlaylistsHandler {
     try {
       const { id } = request.params;
 
+      const { id: credentialId } = request.auth.credentials;
+      const playlistId = request.params.id;
+
+      await this._service.verifyPlaylistOwner(playlistId, credentialId);
+
       await this._service.deletePlaylistById(id);
 
       return {

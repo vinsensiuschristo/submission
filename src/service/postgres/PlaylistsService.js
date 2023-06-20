@@ -30,7 +30,6 @@ class PlaylistsService {
     }
   }
 
-  // tambahan
   async verifyPlaylistAccess(playlistId, songId) {
     try {
       await this.verifyPlaylistOwner(playlistId, songId);
@@ -47,7 +46,6 @@ class PlaylistsService {
     }
   }
 
-  // Service For Playlist
   async addPlaylist({ name, owner }) {
     const id = `playlist-${nanoid(16)}`;
 
@@ -65,7 +63,6 @@ class PlaylistsService {
     return result.rows[0].id;
   }
 
-  // mungkin response nya belum sama
   async getPlaylists(owner) {
     const query = {
       text: 'SELECT * FROM playlists WHERE owner = $1',
@@ -89,23 +86,6 @@ class PlaylistsService {
       throw new NotFoundError('Playlist gagal dihapus. Id tidak ditemukan');
     }
   }
-
-  // // tambahan
-  // async verifyPlaylistSongsAccess(playlistId, songId) {
-  //   try {
-  //     await this.verifyPlaylistOwner(playlistId, songId);
-  //   } catch (error) {
-  //     if (error instanceof NotFoundError) {
-  //       throw error;
-  //     }
-
-  //     try {
-  //       await this._playlistSongsService.verifyPlaylistSongOwner(playlistId, songId);
-  //     } catch {
-  //       throw error;
-  //     }
-  //   }
-  // }
 }
 
 module.exports = PlaylistsService;
