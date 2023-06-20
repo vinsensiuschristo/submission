@@ -22,6 +22,14 @@ class PlaylistSongsHandler {
       await this._playlistsService.verifyPlaylistOwner(playlistId, credentialId);
       const playlistSongId = await this._playlistSongsService.addPlaylistSong(playlistId, songId);
 
+      // add to playlist_song_activities
+      const action = 'post';
+      const time = new Date();
+
+      await this._playlistSongsService.addPlaylistActivities(
+        playlistId, songId, credentialId, action, time,
+      );
+
       const response = h.response({
         status: 'success',
         message: 'Playlist Song berhasil ditambahkan',

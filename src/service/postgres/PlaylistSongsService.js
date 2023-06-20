@@ -92,6 +92,34 @@ class PlaylistSongsService {
       throw new InvariantError('Playlist Songs gagal diverifikasi');
     }
   }
+
+  // playlist_song_activities
+  async addPlaylistActivities(playlistId, songId, userId, action, time) {
+    const id = `activities-${nanoid(16)}`;
+
+    const queryUser = {
+      text: 'SELECT username FROM users WHERE id = $1',
+      values: [userId],
+    };
+    const resultQueryUser = await this._pool.query(queryUser);
+    const userr = resultQueryUser.rows[0].username;
+
+    const querySong = {
+      text: 'SELECT title FROM songs WHERE id = $1',
+      values: [songId],
+    };
+    const resultQuerySong = await this._pool.query(querySong);
+    const songg = resultQuerySong.rows[0].title;
+
+    console.log(songg, userr);
+
+    const query = {
+      text: 'INSERT INTO playlist_song_activities VALUES($1, $2, $3, $4, $5, $6)',
+      values: [id, playlistId, songg, userr, action, time],
+    };
+
+    await this._pool.query(query);
+  }
 }
 
 module.exports = PlaylistSongsService;
