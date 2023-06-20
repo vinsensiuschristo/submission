@@ -97,28 +97,55 @@ class PlaylistSongsService {
   async addPlaylistActivities(playlistId, songId, userId, action, time) {
     const id = `activities-${nanoid(16)}`;
 
-    const queryUser = {
-      text: 'SELECT username FROM users WHERE id = $1',
-      values: [userId],
-    };
-    const resultQueryUser = await this._pool.query(queryUser);
-    const userr = resultQueryUser.rows[0].username;
+    // const queryUser = {
+    //   text: 'SELECT username FROM users WHERE id = $1',
+    //   values: [userId],
+    // };
+    // const resultQueryUser = await this._pool.query(queryUser);
+    // const userr = resultQueryUser.rows[0].username;
 
-    const querySong = {
-      text: 'SELECT title FROM songs WHERE id = $1',
-      values: [songId],
-    };
-    const resultQuerySong = await this._pool.query(querySong);
-    const songg = resultQuerySong.rows[0].title;
+    // const querySong = {
+    //   text: 'SELECT title FROM songs WHERE id = $1',
+    //   values: [songId],
+    // };
+    // const resultQuerySong = await this._pool.query(querySong);
+    // const songg = resultQuerySong.rows[0].title;
 
-    console.log(songg, userr);
+    // console.log(songg, userr);
 
     const query = {
       text: 'INSERT INTO playlist_song_activities VALUES($1, $2, $3, $4, $5, $6)',
-      values: [id, playlistId, songg, userr, action, time],
+      values: [id, playlistId, songId, userId, action, time],
     };
 
     await this._pool.query(query);
+  }
+
+  async getPlaylistActivities(credentialId) {
+    const query = {
+      text: `SELECT users.username, songs.title, playlist_song_activities.action, playlist_song_activities.time 
+      FROM playlist_song_activities 
+      INNER JOIN songs ON playlist_song_activities.song_id = songs.id
+      INNER JOIN users ON playlist_song_activities.user_id = users.id
+      WHERE user_id = $1`,
+      values: [credentialId],
+    };
+
+    // const query1 = {
+    //   text: `SELECT u.username, s.title, a.action, a.time
+    //   FROM playlist_song_activities a
+    //   INNER JOIN songs s
+    //   ON a.song_id = s.id
+    //   INNER JOIN users u
+    //   ON a.user_id = u.id
+    //   WHERE playlist_id = $1
+    //   ORDER BY a.time ASC`,
+    //   values: [playlistId],
+    // };
+
+    const result = await this._pool.query(query);
+
+    return result.rows;
   }
 }
 
