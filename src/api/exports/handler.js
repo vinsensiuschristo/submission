@@ -3,9 +3,10 @@ const autoBind = require('auto-bind');
 const ClientError = require('../../exceptions/ClientError');
 
 class ExportsHandler {
-  constructor(service, validator) {
+  constructor(service, playlistService, validator) {
     this._service = service;
     this._validator = validator;
+    this._playlistService = playlistService;
 
     autoBind(this);
   }
@@ -14,17 +15,20 @@ class ExportsHandler {
     try {
       this._validator.validateExportMusicsPayload(request.payload);
 
+      const userId = request.auth.credentials.id;
+      const { id: playlistId } = request.params;
+
+      // console.log(userId);
+      // console.log(playlistId);
+
+      await this._playlistService.verifyPlaylistOwner(playlistId, userId);
+
       const message = {
         userId: request.auth.credentials.id,
         targetEmail: request.payload.targetEmail,
       };
 
-      // const userId = request.auth.credentials.id;
-
-      // await this._service.getPlaylistsHandler(userId);
-
       await this._service.sendMessage('export:musics', JSON.stringify(message));
-      // await this._service.sendMessage('export:notes', JSON.stringify(message));
 
       const response = h.response({
         status: 'success',
