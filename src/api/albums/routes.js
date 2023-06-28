@@ -19,6 +19,18 @@ const routes = (handler) => [
     path: '/albums/{id}',
     handler: handler.deleteAlbumByIdHandler,
   },
+  // {
+  //   method: 'POST',
+  //   path: '/albums/{id}/covers',
+  //   handler: handler.postUploadImageHandler,
+  //   options: {
+  //     payload: {
+  //       allow: 'multipart/form-data',
+  //       multipart: true,
+  //       output: 'stream',
+  //     },
+  //   },
+  // },
 
 ];
 

@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 /* eslint-disable no-underscore-dangle */
 const ClientError = require('../../exceptions/ClientError');
 
@@ -10,6 +11,7 @@ class AlbumsHandler {
     this.getAlbumByIdHandler = this.getAlbumByIdHandler.bind(this);
     this.putAlbumByIdHandler = this.putAlbumByIdHandler.bind(this);
     this.deleteAlbumByIdHandler = this.deleteAlbumByIdHandler.bind(this);
+    // this.postUploadImageHandler = this.postUploadImageHandler.bind(this);
   }
 
   async postAlbumHandler(request, h) {
@@ -151,6 +153,13 @@ class AlbumsHandler {
       return response;
     }
   }
+
+  // postUploadImageHandler() {
+  //   return {
+  //     status: 'success',
+  //     message: 'TANG INA',
+  //   };
+  // }
 }
 
 module.exports = AlbumsHandler;
