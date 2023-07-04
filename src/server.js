@@ -48,6 +48,9 @@ const uploads = require('./api/uploads');
 const StorageService = require('./service/storage/StorageService');
 const UploadsValidator = require('./validator/uploads');
 
+// albumLikes
+const albumLikes = require('./api/albumlikes');
+
 const init = async () => {
   const albumsService = new AlbumsService();
   const songsService = new SongsService();
@@ -155,6 +158,9 @@ const init = async () => {
         service: storageService,
         validator: UploadsValidator,
       },
+    },
+    {
+      plugin: albumLikes,
     },
   ]);
 

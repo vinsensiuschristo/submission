@@ -1,5 +1,6 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-underscore-dangle */
+const autoBind = require('auto-bind');
 const ClientError = require('../../exceptions/ClientError');
 
 class AlbumsHandler {
@@ -7,11 +8,7 @@ class AlbumsHandler {
     this._service = service;
     this._validator = validator;
 
-    this.postAlbumHandler = this.postAlbumHandler.bind(this);
-    this.getAlbumByIdHandler = this.getAlbumByIdHandler.bind(this);
-    this.putAlbumByIdHandler = this.putAlbumByIdHandler.bind(this);
-    this.deleteAlbumByIdHandler = this.deleteAlbumByIdHandler.bind(this);
-    // this.postUploadImageHandler = this.postUploadImageHandler.bind(this);
+    autoBind(this);
   }
 
   async postAlbumHandler(request, h) {
@@ -148,13 +145,6 @@ class AlbumsHandler {
       return response;
     }
   }
-
-  // postUploadImageHandler() {
-  //   return {
-  //     status: 'success',
-  //     message: 'TANG INA',
-  //   };
-  // }
 }
 
 module.exports = AlbumsHandler;
