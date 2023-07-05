@@ -26,7 +26,7 @@ class PlaylistSongsService {
     }
 
     const query = {
-      text: 'INSERT INTO playlist_songs  VALUES($1, $2, $3) RETURNING id',
+      text: 'INSERT INTO playlist_songs VALUES($1, $2, $3) RETURNING id',
       values: [id, playlistId, songId],
     };
 

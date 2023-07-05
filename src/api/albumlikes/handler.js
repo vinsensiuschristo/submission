@@ -1,35 +1,111 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-underscore-dangle */
 const autoBind = require('auto-bind');
-// const ClientError = require('../../exceptions/ClientError');
+const ClientError = require('../../exceptions/ClientError');
 
 class AlbumLikesHandler {
-  constructor(service, validator) {
+  constructor(service) {
     this._service = service;
-    this._validator = validator;
 
     autoBind(this);
   }
 
-  async postAlbumLikeHandler() {
-    return {
-      status: 'success',
-      messag: 'postAlbumLikeHandler 123',
-    };
+  async postAlbumLikeHandler(request, h) {
+    try {
+      const { id: credentialId } = request.auth.credentials;
+      const albumId = request.params.id;
+
+      await this._service.addAlbumLike(credentialId, albumId);
+
+      const response = h.response({
+        status: 'success',
+        message: 'Like pada Album berhasil ditambahkan',
+      });
+      response.code(201);
+      return response;
+    } catch (error) {
+      if (error instanceof ClientError) {
+        const response = h.response({
+          status: 'fail',
+          message: error.message,
+        });
+        response.code(error.statusCode);
+        return response;
+      }
+      // Server ERROR!
+      const response = h.response({
+        status: 'error',
+        message: 'Maaf, terjadi kegagalan pada server kami.',
+      });
+      response.code(500);
+      console.error(error);
+      return response;
+    }
   }
 
-  async deleteAlbumLikeByIdHandler() {
-    return {
-      status: 'success',
-      messag: 'deleteAlbumLikeByIdHandler',
-    };
+  async deleteAlbumLikeByIdHandler(request, h) {
+    try {
+      const { id: credentialId } = request.auth.credentials;
+      const albumId = request.params.id;
+
+      await this._service.deleteAlbumLike(credentialId, albumId);
+
+      return {
+        status: 'success',
+        message: 'Like pada Album berhasil dihapus',
+      };
+    } catch (error) {
+      if (error instanceof ClientError) {
+        const response = h.response({
+          status: 'fail',
+          message: error.message,
+        });
+        response.code(error.statusCode);
+        return response;
+      }
+
+      // Server ERROR!
+      const response = h.response({
+        status: 'error',
+        message: 'Maaf, terjadi kegagalan pada server kami.',
+      });
+      response.code(500);
+      console.error(error);
+      return response;
+    }
   }
 
-  async getAlbumLikeByIdHandler() {
-    return {
-      status: 'success',
-      messag: 'getAlbumLikeByIdHandler',
-    };
+  async getAlbumLikeByIdHandler(request, h) {
+    try {
+      const albumId = request.params.id;
+
+      const likeCount = await this._service.getAlbumLikeById(albumId);
+
+      return {
+        status: 'success',
+        data: {
+          likes: likeCount,
+        },
+      };
+    } catch (error) {
+      if (error instanceof ClientError) {
+        const response = h.response({
+          status: 'fail',
+          message: error.message,
+        });
+        response.code(error.statusCode);
+        return response;
+      }
+
+      // Server ERROR!
+      const response = h.response({
+        status: 'error',
+        message: 'Maaf, terjadi kegagalan pada server kami.',
+      });
+      response.code(500);
+      console.error(error);
+      return response;
+    }
   }
 }
 
