@@ -81,12 +81,20 @@ class AlbumLikesHandler {
 
       const likeCount = await this._service.getAlbumLikeById(albumId);
 
-      return {
+      console.log(JSON.parse(JSON.stringify(likeCount)));
+
+      const tempLikeCount = JSON.parse(JSON.stringify(likeCount));
+
+      const response = h.response({
         status: 'success',
         data: {
-          likes: likeCount,
+          likes: tempLikeCount.rows.length,
         },
-      };
+      });
+      // console.log(cache.provision());
+      response.header('X-Data-Source', 'cache');
+
+      return response;
     } catch (error) {
       if (error instanceof ClientError) {
         const response = h.response({

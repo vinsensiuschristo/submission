@@ -6,8 +6,9 @@ const NotFoundError = require('../../exceptions/NotFoundError');
 const InvariantError = require('../../exceptions/InvariantError');
 
 class AlbumLikesService {
-  constructor() {
+  constructor(cacheService) {
     this._pool = new Pool();
+    this._cacheService = cacheService;
   }
 
   async addAlbumLike(userId, albumId) {
@@ -49,6 +50,9 @@ class AlbumLikesService {
       throw new InvariantError('Album Likes gagal ditambahkan');
     }
 
+    // cache
+    await this._cacheService.delete(`album:${albumId}`);
+
     return result.rows[0].id;
   }
 
@@ -63,17 +67,34 @@ class AlbumLikesService {
     if (!result.rows.length) {
       throw new InvariantError('Album Likes gagal dihapus');
     }
+
+    // cache
+    await this._cacheService.delete(`album:${albumId}`);
   }
 
   async getAlbumLikeById(albumId) {
-    const query = {
-      text: 'SELECT id FROM user_album_likes WHERE album_id = $1',
-      values: [albumId],
-    };
+    try {
+      // cache
+      const result = await this._cacheService.get(`album:${albumId}`);
+      // console.log(result);
+      return JSON.parse(result);
+    } catch (error) {
+      const query = {
+        text: 'SELECT id FROM user_album_likes WHERE album_id = $1',
+        values: [albumId],
+      };
 
-    const result = await this._pool.query(query);
+      const result = await this._pool.query(query);
+      const mapAlbumId = result.rows.map((i) => i.id);
+      // console.log(mapAlbumId);
 
-    return result.rowCount;
+      // catatan akan disimpan pada cache sebelum fungsi getNotes dikembalikan
+      // await this._cacheService.set(`notes:${owner}`, JSON.stringify(mappedResult));
+
+      await this._cacheService.set(`album:${albumId}`, JSON.stringify(mapAlbumId));
+
+      return result.rowCount;
+    }
   }
 }
 
