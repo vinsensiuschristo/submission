@@ -2,6 +2,7 @@
 /* eslint-disable no-unused-vars */
 const { Pool } = require('pg');
 const { nanoid } = require('nanoid');
+const { cache } = require('joi');
 const NotFoundError = require('../../exceptions/NotFoundError');
 const InvariantError = require('../../exceptions/InvariantError');
 
@@ -79,9 +80,12 @@ class AlbumLikesService {
     try {
       // cache
       const result = await this._cacheService.get(`album:${albumId}`);
-      console.log('getAlbum with Cache', result);
+      console.log('getAlbum with Cache', JSON.parse(result));
 
-      return JSON.parse(result);
+      return {
+        likesCount: JSON.parse(result),
+        source: cache,
+      };
     } catch (error) {
       const query = {
         text: `SELECT COUNT(id)
@@ -91,17 +95,21 @@ class AlbumLikesService {
       };
 
       const result = await this._pool.query(query);
-      const mapAlbumId = result.rowCount;
-      console.log('map album', mapAlbumId);
+
+      const likesCount = result.rows[0].count;
+      console.log('likesCount', likesCount);
 
       // catatan akan disimpan pada cache sebelum fungsi getNotes dikembalikan
       // await this._cacheService.set(`notes:${owner}`, JSON.stringify(mappedResult));
 
-      await this._cacheService.set(`album:${albumId}`, JSON.stringify(mapAlbumId));
+      await this._cacheService.set(`album:${albumId}`, JSON.stringify(likesCount));
 
       console.log('getAlbumNoCache', `album:${albumId}`);
 
-      return result.rowCount;
+      return {
+        likesCount,
+        source: cache,
+      };
     }
   }
 }
