@@ -84,7 +84,7 @@ class AlbumLikesService {
 
       return {
         likesCount: JSON.parse(result),
-        source: cache,
+        source: 'cache',
       };
     } catch (error) {
       const query = {
@@ -108,7 +108,7 @@ class AlbumLikesService {
 
       return {
         likesCount,
-        source: cache,
+        source: 'db',
       };
     }
   }
