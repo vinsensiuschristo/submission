@@ -1,11 +1,10 @@
-/* eslint-disable no-underscore-dangle */
 const autoBind = require('auto-bind');
 const ClientError = require('../../exceptions/ClientError');
 
 class PlaylistsHandler {
   constructor(service, validator) {
-    this._service = service;
-    this._validator = validator;
+    this.service = service;
+    this.validator = validator;
 
     autoBind(this);
   }
@@ -13,14 +12,14 @@ class PlaylistsHandler {
   //   Playlist Handler
   async postPlaylistHandler(request, h) {
     try {
-      this._validator.validatePlaylistPayload(request.payload);
+      this.validator.validatePlaylistPayload(request.payload);
 
       const { name } = request.payload;
 
       // tambahan dari authorziation
       const { id: credentialId } = request.auth.credentials;
 
-      const playlistId = await this._service.addPlaylist({
+      const playlistId = await this.service.addPlaylist({
         name, owner: credentialId,
       });
 
@@ -59,7 +58,7 @@ class PlaylistsHandler {
       // tambahan
       const { id: credentialId } = request.auth.credentials;
 
-      const playlists = await this._service.getPlaylists(credentialId);
+      const playlists = await this.service.getPlaylists(credentialId);
 
       return {
         status: 'success',
@@ -84,9 +83,9 @@ class PlaylistsHandler {
       const { id: credentialId } = request.auth.credentials;
       const playlistId = request.params.id;
 
-      await this._service.verifyPlaylistOwner(playlistId, credentialId);
+      await this.service.verifyPlaylistOwner(playlistId, credentialId);
 
-      await this._service.deletePlaylistById(id);
+      await this.service.deletePlaylistById(id);
 
       return {
         status: 'success',

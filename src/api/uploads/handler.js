@@ -1,11 +1,10 @@
-/* eslint-disable no-underscore-dangle */
 const autoBind = require('auto-bind');
 const ClientError = require('../../exceptions/ClientError');
 
 class UploadsHandler {
   constructor(service, validator) {
-    this._service = service;
-    this._validator = validator;
+    this.service = service;
+    this.validator = validator;
 
     autoBind(this);
   }
@@ -15,12 +14,12 @@ class UploadsHandler {
       const { cover } = request.payload;
       const { id: albumId } = request.params;
 
-      this._validator.validateImageHeaders(cover.hapi.headers);
+      this.validator.validateImageHeaders(cover.hapi.headers);
 
-      const filename = await this._service.writeFile(cover, cover.hapi);
+      const filename = await this.service.writeFile(cover, cover.hapi);
       const coverUrl = `http://${process.env.HOST}:${process.env.PORT}/upload/${filename}`;
 
-      await this._service.addCover(albumId, coverUrl);
+      await this.service.addCover(albumId, coverUrl);
 
       console.log(coverUrl);
 

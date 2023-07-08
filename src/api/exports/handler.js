@@ -1,27 +1,23 @@
-/* eslint-disable no-underscore-dangle */
 const autoBind = require('auto-bind');
 const ClientError = require('../../exceptions/ClientError');
 
 class ExportsHandler {
   constructor(service, playlistService, validator) {
-    this._service = service;
-    this._validator = validator;
-    this._playlistService = playlistService;
+    this.service = service;
+    this.validator = validator;
+    this.playlistService = playlistService;
 
     autoBind(this);
   }
 
   async postExportMusicsHandler(request, h) {
     try {
-      this._validator.validateExportMusicsPayload(request.payload);
+      this.validator.validateExportMusicsPayload(request.payload);
 
       const userId = request.auth.credentials.id;
       const { id: playlistId } = request.params;
 
-      // console.log(userId);
-      // console.log(playlistId);
-
-      await this._playlistService.verifyPlaylistOwner(playlistId, userId);
+      await this.playlistService.verifyPlaylistOwner(playlistId, userId);
 
       const message = {
         userId: request.auth.credentials.id,
@@ -29,7 +25,7 @@ class ExportsHandler {
         targetEmail: request.payload.targetEmail,
       };
 
-      await this._service.sendMessage('export:musics', JSON.stringify(message));
+      await this.service.sendMessage('export:musics', JSON.stringify(message));
 
       const response = h.response({
         status: 'success',

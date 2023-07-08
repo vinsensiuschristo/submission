@@ -7,8 +7,8 @@ const AuthorizationError = require('../../exceptions/AuthorizationError');
 
 class PlaylistsService {
   constructor(playlistSongsService) {
-    this._pool = new Pool();
-    this._playlistSongsService = playlistSongsService;
+    this.pool = new Pool();
+    this.playlistSongsService = playlistSongsService;
   }
 
   async verifyPlaylistOwner(id, owner) {
@@ -17,7 +17,7 @@ class PlaylistsService {
       values: [id],
     };
 
-    const result = await this._pool.query(query);
+    const result = await this.pool.query(query);
 
     if (!result.rows.length) {
       throw new NotFoundError('Playlist tidak ditemukan');
@@ -54,7 +54,7 @@ class PlaylistsService {
       values: [id, name, owner],
     };
 
-    const result = await this._pool.query(query);
+    const result = await this.pool.query(query);
 
     if (!result.rows[0].id) {
       throw new InvariantError('Album gagal ditambahkan');
@@ -69,7 +69,7 @@ class PlaylistsService {
       values: [owner],
     };
 
-    const result = await this._pool.query(query);
+    const result = await this.pool.query(query);
 
     return result.rows;
   }
@@ -80,7 +80,7 @@ class PlaylistsService {
       values: [id],
     };
 
-    const result = await this._pool.query(query);
+    const result = await this.pool.query(query);
 
     if (!result.rows.length) {
       throw new NotFoundError('Playlist gagal dihapus. Id tidak ditemukan');

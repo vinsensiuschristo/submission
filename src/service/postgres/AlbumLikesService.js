@@ -1,15 +1,13 @@
 /* eslint-disable no-underscore-dangle */
-/* eslint-disable no-unused-vars */
 const { Pool } = require('pg');
 const { nanoid } = require('nanoid');
-const { cache } = require('joi');
 const NotFoundError = require('../../exceptions/NotFoundError');
 const InvariantError = require('../../exceptions/InvariantError');
 
 class AlbumLikesService {
   constructor(cacheService) {
-    this._pool = new Pool();
-    this._cacheService = cacheService;
+    this.pool = new Pool();
+    this.cacheService = cacheService;
   }
 
   async addAlbumLike(userId, albumId) {
@@ -21,7 +19,7 @@ class AlbumLikesService {
       values: [albumId],
     };
 
-    const resultAlbumQuery = await this._pool.query(checkAlbumQuery);
+    const resultAlbumQuery = await this.pool.query(checkAlbumQuery);
 
     if (!resultAlbumQuery.rows.length) {
       throw new NotFoundError('Album Likes gagal ditambahkan, Album tidak ditemukan');
@@ -33,7 +31,7 @@ class AlbumLikesService {
       values: [userId, albumId],
     };
 
-    const resultCheckAlbumLikes = await this._pool.query(checkAlbumLikes);
+    const resultCheckAlbumLikes = await this.pool.query(checkAlbumLikes);
 
     if (resultCheckAlbumLikes.rowCount >= 1) {
       throw new InvariantError('Album Likes gagal ditambahkan, Album sudah di-Like');
@@ -44,14 +42,14 @@ class AlbumLikesService {
       values: [id, userId, albumId],
     };
 
-    const result = await this._pool.query(query);
+    const result = await this.pool.query(query);
 
     if (!result.rows.length) {
       throw new InvariantError('Album Likes gagal ditambahkan');
     }
 
     // cache
-    await this._cacheService.delete(`album:${albumId}`);
+    await this.cacheService.delete(`album:${albumId}`);
 
     return result.rows[0].id;
   }
@@ -62,20 +60,20 @@ class AlbumLikesService {
       values: [userId, albumId],
     };
 
-    const result = await this._pool.query(query);
+    const result = await this.pool.query(query);
 
     if (!result.rows.length) {
       throw new InvariantError('Album Likes gagal dihapus');
     }
 
     // cache
-    await this._cacheService.delete(`album:${albumId}`);
+    await this.cacheService.delete(`album:${albumId}`);
   }
 
   async getAlbumLikeById(albumId) {
     try {
       // cache
-      const result = await this._cacheService.get(`album:${albumId}`);
+      const result = await this.cacheService.get(`album:${albumId}`);
 
       return {
         likesCount: JSON.parse(result),
@@ -89,11 +87,11 @@ class AlbumLikesService {
         values: [albumId],
       };
 
-      const result = await this._pool.query(query);
+      const result = await this.pool.query(query);
 
       const likesCount = result.rows[0].count;
 
-      await this._cacheService.set(`album:${albumId}`, JSON.stringify(likesCount));
+      await this.cacheService.set(`album:${albumId}`, JSON.stringify(likesCount));
 
       return {
         likesCount,

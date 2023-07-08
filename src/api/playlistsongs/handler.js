@@ -1,32 +1,31 @@
-/* eslint-disable no-underscore-dangle */
 const autoBind = require('auto-bind');
 const ClientError = require('../../exceptions/ClientError');
 
 class PlaylistSongsHandler {
   constructor(playlistSongsService, playlistsService, validator) {
-    this._playlistSongsService = playlistSongsService;
-    this._playlistsService = playlistsService;
-    this._validator = validator;
+    this.playlistSongsService = playlistSongsService;
+    this.playlistsService = playlistsService;
+    this.validator = validator;
 
     autoBind(this);
   }
 
   async postPlaylistSongHandler(request, h) {
     try {
-      this._validator.validatePlaylistSongPayload(request.payload);
+      this.validator.validatePlaylistSongPayload(request.payload);
 
       const { id: credentialId } = request.auth.credentials;
       const { songId } = request.payload;
       const playlistId = request.params.id;
 
-      await this._playlistsService.verifyPlaylistOwner(playlistId, credentialId);
-      const playlistSongId = await this._playlistSongsService.addPlaylistSong(playlistId, songId);
+      await this.playlistsService.verifyPlaylistOwner(playlistId, credentialId);
+      const playlistSongId = await this.playlistSongsService.addPlaylistSong(playlistId, songId);
 
       // add to playlist_song_activities
       const action = 'add';
       const time = new Date();
 
-      await this._playlistSongsService.addPlaylistActivities(
+      await this.playlistSongsService.addPlaylistActivities(
         playlistId, songId, credentialId, action, time,
       );
 
@@ -65,10 +64,10 @@ class PlaylistSongsHandler {
       const { id: credentialId } = request.auth.credentials;
       const playlistId = request.params.id;
 
-      await this._playlistsService.verifyPlaylistOwner(playlistId, credentialId);
+      await this.playlistsService.verifyPlaylistOwner(playlistId, credentialId);
 
-      const playlists = await this._playlistSongsService.getPlaylistSong(playlistId, credentialId);
-      const songs = await this._playlistSongsService.getSongs(playlistId);
+      const playlists = await this.playlistSongsService.getPlaylistSong(playlistId, credentialId);
+      const songs = await this.playlistSongsService.getSongs(playlistId);
 
       return {
         status: 'success',
@@ -104,19 +103,19 @@ class PlaylistSongsHandler {
 
   async deletePlaylistSongHandler(request, h) {
     try {
-      this._validator.validatePlaylistSongPayload(request.payload);
+      this.validator.validatePlaylistSongPayload(request.payload);
       const { id: credentialId } = request.auth.credentials;
       const { songId } = request.payload;
       const playlistId = request.params.id;
 
-      await this._playlistsService.verifyPlaylistOwner(playlistId, credentialId);
-      await this._playlistSongsService.deletePlaylistSongById(playlistId, songId);
+      await this.playlistsService.verifyPlaylistOwner(playlistId, credentialId);
+      await this.playlistSongsService.deletePlaylistSongById(playlistId, songId);
 
       // add to playlist_song_activities
       const action = 'delete';
       const time = new Date();
 
-      await this._playlistSongsService.addPlaylistActivities(
+      await this.playlistSongsService.addPlaylistActivities(
         playlistId, songId, credentialId, action, time,
       );
 
@@ -150,9 +149,9 @@ class PlaylistSongsHandler {
       const { id: credentialId } = request.auth.credentials;
       const playlistId = request.params.id;
 
-      await this._playlistsService.verifyPlaylistOwner(playlistId, credentialId);
+      await this.playlistsService.verifyPlaylistOwner(playlistId, credentialId);
 
-      const activities = await this._playlistSongsService.getPlaylistActivities(credentialId);
+      const activities = await this.playlistSongsService.getPlaylistActivities(credentialId);
 
       return {
         status: 'success',

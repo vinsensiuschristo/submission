@@ -7,7 +7,7 @@ const { mapDBToModelAlbum } = require('../../utils');
 
 class AlbumService {
   constructor() {
-    this._pool = new Pool();
+    this.pool = new Pool();
   }
 
   async addAlbum({ name, year }) {
@@ -20,7 +20,7 @@ class AlbumService {
       values: [id, name, year, createdAt, updatedAt],
     };
 
-    const result = await this._pool.query(query);
+    const result = await this.pool.query(query);
 
     if (!result.rows[0].id) {
       throw new InvariantError('Album gagal ditambahkan');
@@ -36,7 +36,7 @@ class AlbumService {
       values: [id],
     };
 
-    const result = await this._pool.query(query);
+    const result = await this.pool.query(query);
 
     if (!result.rows.length) {
       throw new NotFoundError('Catatan tidak ditemukan');
@@ -51,7 +51,7 @@ class AlbumService {
       values: [id],
     };
 
-    const result = await this._pool.query(query);
+    const result = await this.pool.query(query);
 
     return result.rows;
   }
@@ -63,7 +63,7 @@ class AlbumService {
       values: [name, year, updatedAt, id],
     };
 
-    const result = await this._pool.query(query);
+    const result = await this.pool.query(query);
 
     if (!result.rows.length) {
       throw new NotFoundError(
@@ -78,7 +78,7 @@ class AlbumService {
       values: [id],
     };
 
-    const result = await this._pool.query(query);
+    const result = await this.pool.query(query);
 
     if (!result.rows.length) {
       throw new NotFoundError('Album gagal dihapus. Id tidak ditemukan');

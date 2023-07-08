@@ -7,7 +7,7 @@ const NotFoundError = require('../../exceptions/NotFoundError');
 
 class PlaylistSongsService {
   constructor() {
-    this._pool = new Pool();
+    this.pool = new Pool();
   }
 
   async addPlaylistSong(playlistId, songId) {
@@ -19,7 +19,7 @@ class PlaylistSongsService {
       values: [songId],
     };
 
-    const resultSongQuery = await this._pool.query(checkSongQuery);
+    const resultSongQuery = await this.pool.query(checkSongQuery);
 
     if (!resultSongQuery.rows.length) {
       throw new NotFoundError('Playlist Song gagal ditambahkan, Song tidak ditemukan');
@@ -30,7 +30,7 @@ class PlaylistSongsService {
       values: [id, playlistId, songId],
     };
 
-    const result = await this._pool.query(query);
+    const result = await this.pool.query(query);
 
     if (!result.rows.length) {
       throw new InvariantError('Playlist Songs gagal ditambahkan');
@@ -48,7 +48,7 @@ class PlaylistSongsService {
       values: [playlistId, credentialId],
     };
 
-    const result = await this._pool.query(query);
+    const result = await this.pool.query(query);
 
     return result.rows[0];
   }
@@ -62,7 +62,7 @@ class PlaylistSongsService {
       WHERE playlist_songs.playlist_id = $1`,
       values: [id],
     };
-    const songsResult = await this._pool.query(queryGetSongs);
+    const songsResult = await this.pool.query(queryGetSongs);
 
     return songsResult.rows;
   }
@@ -73,7 +73,7 @@ class PlaylistSongsService {
       values: [playlistId, songId],
     };
 
-    const result = await this._pool.query(query);
+    const result = await this.pool.query(query);
 
     if (!result.rows.length) {
       throw new InvariantError('Playlist Songs gagal dihapus');
@@ -86,7 +86,7 @@ class PlaylistSongsService {
       values: [playlistId, songId],
     };
 
-    const result = await this._pool.query(query);
+    const result = await this.pool.query(query);
 
     if (!result.rows.length) {
       throw new InvariantError('Playlist Songs gagal diverifikasi');
@@ -101,7 +101,7 @@ class PlaylistSongsService {
       values: [id, playlistId, songId, userId, action, time],
     };
 
-    await this._pool.query(query);
+    await this.pool.query(query);
   }
 
   async getPlaylistActivities(credentialId) {
@@ -114,7 +114,7 @@ class PlaylistSongsService {
       values: [credentialId],
     };
 
-    const result = await this._pool.query(query);
+    const result = await this.pool.query(query);
 
     return result.rows;
   }

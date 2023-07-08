@@ -5,7 +5,7 @@ const ClientError = require('../../exceptions/ClientError');
 
 class AlbumLikesHandler {
   constructor(service) {
-    this._service = service;
+    this.service = service;
 
     autoBind(this);
   }
@@ -15,7 +15,7 @@ class AlbumLikesHandler {
       const { id: credentialId } = request.auth.credentials;
       const albumId = request.params.id;
 
-      await this._service.addAlbumLike(credentialId, albumId);
+      await this.service.addAlbumLike(credentialId, albumId);
 
       const response = h.response({
         status: 'success',
@@ -48,7 +48,7 @@ class AlbumLikesHandler {
       const { id: credentialId } = request.auth.credentials;
       const albumId = request.params.id;
 
-      await this._service.deleteAlbumLike(credentialId, albumId);
+      await this.service.deleteAlbumLike(credentialId, albumId);
 
       return {
         status: 'success',
@@ -78,7 +78,7 @@ class AlbumLikesHandler {
   async getAlbumLikeByIdHandler(request, h) {
     try {
       const albumId = request.params.id;
-      const likesData = await this._service.getAlbumLikeById(albumId);
+      const likesData = await this.service.getAlbumLikeById(albumId);
 
       const { likesCount, source } = likesData;
 

@@ -6,7 +6,7 @@ const { Pool } = require('pg');
 class StorageService {
   constructor(folder) {
     this._folder = folder;
-    this._pool = new Pool();
+    this.pool = new Pool();
 
     if (!fs.existsSync(folder)) {
       fs.mkdirSync(folder, { recursive: true });
@@ -32,7 +32,7 @@ class StorageService {
       values: [albumId, cover],
     };
 
-    const result = this._pool.query(query);
+    const result = this.pool.query(query);
 
     return result;
   }
