@@ -1,4 +1,5 @@
 /* eslint-disable no-underscore-dangle */
+const autoBind = require('auto-bind');
 const ClientError = require('../../exceptions/ClientError');
 
 class SongsHandler {
@@ -6,34 +7,23 @@ class SongsHandler {
     this._service = service;
     this._validator = validator;
 
-    this.postSongHandler = this.postSongHandler.bind(this);
-    this.getSongsHandler = this.getSongsHandler.bind(this);
-    this.getSongByIdHandler = this.getSongByIdHandler.bind(this);
-    this.putSongByIdHandler = this.putSongByIdHandler.bind(this);
-    this.deleteSongByIdHandler = this.deleteSongByIdHandler.bind(this);
+    autoBind(this);
   }
 
   async postSongHandler(request, h) {
     try {
       this._validator.validateSongPayload(request.payload);
 
-      const {
-        title = 'untitled',
-        year,
-        genre,
-        performer,
-        duration,
-        albumId,
-      } = request.payload;
+      // const {
+      //   title = 'untitled',
+      //   year,
+      //   genre,
+      //   performer,
+      //   duration,
+      //   albumId,
+      // } = request.payload;
 
-      const songId = await this._service.addSong({
-        title,
-        year,
-        genre,
-        performer,
-        duration,
-        albumId,
-      });
+      const songId = await this._service.addSong(request.payload);
 
       const response = h.response({
         status: 'success',
