@@ -34,7 +34,6 @@ class AlbumLikesService {
     };
 
     const resultCheckAlbumLikes = await this._pool.query(checkAlbumLikes);
-    // console.log(resultCheckAlbumLikes.rowCount);
 
     if (resultCheckAlbumLikes.rowCount >= 1) {
       throw new InvariantError('Album Likes gagal ditambahkan, Album sudah di-Like');
@@ -51,11 +50,8 @@ class AlbumLikesService {
       throw new InvariantError('Album Likes gagal ditambahkan');
     }
 
-    // console.log('addAlbum', `album:${albumId}`);
-
     // cache
     await this._cacheService.delete(`album:${albumId}`);
-    console.log('delete cahce addAlbum', `album:${albumId}`);
 
     return result.rows[0].id;
   }
@@ -80,7 +76,6 @@ class AlbumLikesService {
     try {
       // cache
       const result = await this._cacheService.get(`album:${albumId}`);
-      console.log('getAlbum with Cache', JSON.parse(result));
 
       return {
         likesCount: JSON.parse(result),
@@ -97,14 +92,8 @@ class AlbumLikesService {
       const result = await this._pool.query(query);
 
       const likesCount = result.rows[0].count;
-      console.log('likesCount', likesCount);
-
-      // catatan akan disimpan pada cache sebelum fungsi getNotes dikembalikan
-      // await this._cacheService.set(`notes:${owner}`, JSON.stringify(mappedResult));
 
       await this._cacheService.set(`album:${albumId}`, JSON.stringify(likesCount));
-
-      console.log('getAlbumNoCache', `album:${albumId}`);
 
       return {
         likesCount,

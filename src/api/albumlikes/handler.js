@@ -78,18 +78,11 @@ class AlbumLikesHandler {
   async getAlbumLikeByIdHandler(request, h) {
     try {
       const albumId = request.params.id;
-      // const likeCount = await this._service.getAlbumLikeById(albumId);
       const likesData = await this._service.getAlbumLikeById(albumId);
-
-      // console.log('console log handler', likeCount);
 
       const { likesCount, source } = likesData;
 
-      // console.log('likecount', likesCount);
-      // console.log('source', source);
-
       const tempLikeCount = JSON.parse(likesCount);
-      console.log(tempLikeCount);
 
       const response = h.response({
         status: 'success',
